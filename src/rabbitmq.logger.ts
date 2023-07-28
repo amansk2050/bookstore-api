@@ -2,7 +2,7 @@
 import * as amqp from 'amqplib';
 
 export async function setupRabbitMQLogger() {
-  const connection = await amqp.connect('amqp://localhost');
+  const connection = await amqp.connect('amqp://localhost:5672');
   const channel = await connection.createChannel();
   const exchange = 'api_logs';
   await channel.assertExchange(exchange, 'fanout', { durable: false });

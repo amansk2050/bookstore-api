@@ -12,6 +12,7 @@ export class OrdersService {
 
   async createOrder(userId: number, bookId: number) {
     try {
+
       const userData = await this.getPoints(userId);
       if (userData.points > 0) {
         return this.prisma.order.create({
@@ -30,9 +31,9 @@ export class OrdersService {
 
   }
 
-  async cancelOrder(id: number) {
+  async cancelOrder(id: number,bookId:number) {
     return this.prisma.order.delete({
-      where: { id },
+      where: {bookId },
     });
   }
 

@@ -5,7 +5,7 @@ import { setupRabbitMQLogger } from './rabbitmq.logger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  // setupRabbitMQLogger();
+  setupRabbitMQLogger();
 
   const config = new DocumentBuilder()
     .setTitle('Bookstore API')

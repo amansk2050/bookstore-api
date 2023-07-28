@@ -8,49 +8,50 @@ import { RegisterUsersDto } from "./dto/register-user.dto";
 import { Users } from "src/users/users.model";
 
 @Injectable()
-export class AuthService{
+export class AuthService {
 
      constructor(
           private readonly prismaService: PrismaService,
           private jwtService: JwtService,
-          private readonly usersService: UsersService){}
+          private readonly usersService: UsersService) { }
 
-     
-     async login(loginDto: LoginDto):Promise<any>{
-          const {username,password} = loginDto;
 
-          const users =await this.prismaService.users.findUnique({
-               where: {username}
+     async login(loginDto: LoginDto): Promise<any> {
+          const { username, password } = loginDto;
+
+          const users = await this.prismaService.users.findUnique({
+               where: { username }
           })
 
-          if(!users){
+
+          if (!users) {
                throw new NotFoundException('user not found')
           }
 
-          const validatePassword = await bcrypt.compare(password,users.password)
+          const validatePassword = await bcrypt.compare(password, users.password)
 
-          if(!validatePassword){
+          if (!validatePassword) {
                throw new NotFoundException('Invalid password')
           }
 
           return {
-               token: this.jwtService.sign({username})
+               token: this.jwtService.sign({ id:users.id })
           }
      }
 
 
 
-     async register (createDto: RegisterUsersDto): Promise<any>{
+     async register(createDto: RegisterUsersDto): Promise<any> {
           const createUser = new Users();
-    createUser.name = createDto.name;
-    createUser.username = createDto.username;
-    createUser.password = await bcrypt.hash(createDto.password, 10);
+          createUser.name = createDto.name;
+          createUser.username = createDto.username;
+          createUser.password = await bcrypt.hash(createDto.password, 10);
 
-    const user = await this.usersService.createUser(createUser);
+          const user = await this.usersService.createUser(createUser);
+          const id =user.id
+          return {
+               token: this.jwtService.sign({ id }),
+          };
+     }
 
-    return {
-      token: this.jwtService.sign({ username: user.username }),
-    };
-  }
-     
 }

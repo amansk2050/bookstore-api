@@ -1,14 +1,14 @@
-// controllers/order.controller.ts
-import { Body, Controller, Delete, Get, Param, Post, Put, Req, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Order } from './orders.model';
 import { OrdersService } from "./orders.service";
 import { Request, Response } from "express";
+import { Auth, GetUserID } from 'src/authentication/auth.gaurd';
 
 @ApiTags('orders')
 @Controller('orders')
 export class OrdersController {
-  constructor(private readonly orderService: OrdersService) {}
+  constructor(private readonly orderService: OrdersService) { }
 
   @Get()
   async getAllOrders() {
@@ -16,12 +16,14 @@ export class OrdersController {
   }
 
   @Post()
-  async createOrder(@Body() data: { userId: number, bookId: number }) {
-    return this.orderService.createOrder(data.userId, data.bookId);
+  @Auth()
+  async createOrder(@GetUserID('id') id: number, @Body() data: { bookId: number }) {
+    return this.orderService.createOrder(id, data.bookId);
   }
 
   @Delete(':id')
-  async cancelOrder(@Param('id') id: number) {
-    return this.orderService.cancelOrder(id);
+  @Auth()
+  async cancelOrder(@GetUserID('id') id: number,@Param('id') bookId: number) {
+    return this.orderService.cancelOrder(id,bookId);
   }
 }
